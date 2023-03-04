@@ -38,6 +38,7 @@ dependencies:
   code_text_field: ^1.1.0
   flutter_highlight: ^0.7.0
   click_to_copy: ^0.0.1
+  clipboard: ^0.1.3
 
 dev_dependencies:
   flutter_test:
@@ -78,17 +79,18 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  #fonts:
+  # - family: Aldrich
+  #    fonts:
+  #      - asset: fonts/Aldrich-Regular.ttf
+  #      - asset: fonts/Aldrich-Italic.ttf
+  #        style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
