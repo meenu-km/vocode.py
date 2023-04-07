@@ -10,7 +10,7 @@ STREAM = True
 
 def initialize_openai_api():
     config = configparser.ConfigParser()
-    config.read('config')
+    config.read('/etc/secrets/config')
     openai.api_key = config['api_key']['secret_key']
 
 def create_input_prompt(englishTextIn=""):
