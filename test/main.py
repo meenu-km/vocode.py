@@ -1,15 +1,17 @@
 from fastapi import FastAPI
 import openai
+import configparser
 
 app = FastAPI()
 
 MAX_TOKEN_DEFAULT = 128
 TEMPERATURE = 0.0
-
 STREAM = True
 
 def initialize_openai_api():
-    openai.api_key = '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'
+    config = configparser.ConfigParser()
+    config.read('config')
+    openai.api_key = config['api_key']['secret_key']
 
 def create_input_prompt(englishTextIn=""):
     prompt = "The following bot transforms natural language to Python code. \n" + \
@@ -38,8 +40,14 @@ def get_generated_response(response):
 
 @app.get("/")
 def predict(englishText:str):
+# def predict():
+    # prompt format: python program + the desired action
+    initialize_openai_api()
+    # englishText = 'def add_two_numbers(a, b): #initialise a to 3 in the function'
     prompt = create_input_prompt(englishText)
+    # print(prompt)
     response = generate_completion(prompt)
     op = get_generated_response(response)
+    # print(op)
     
     return{"output":op}
