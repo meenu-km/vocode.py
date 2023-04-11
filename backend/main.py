@@ -4,13 +4,13 @@ import configparser
 
 app = FastAPI()
 
-MAX_TOKEN_DEFAULT = 128
+MAX_TOKEN_DEFAULT = 2048
 TEMPERATURE = 0.0
 STREAM = True
 
 def initialize_openai_api():
     config = configparser.ConfigParser()
-    config.read('/etc/secrets/config')
+    config.read('config')
     openai.api_key = config['api_key']['secret_key']
 
 def create_input_prompt(englishTextIn=""):
@@ -29,9 +29,11 @@ def generate_completion(input_prompt, num_tokens=MAX_TOKEN_DEFAULT):
 
 
 def get_generated_response(response):
-    generatedCode = "## Python code generated from plain english: \n"
-    while True:
-        nextResponse = next(response)
+    # generatedCode = "## Python code generated from plain english: \n"
+    generatedCode = ""
+    # while True:
+    for nextResponse in response:
+        # nextResponse = next(response)
         completion = nextResponse['choices'][0]['text']
         generatedCode = generatedCode + completion
         if nextResponse['choices'][0]['finish_reason'] is not None:
@@ -40,14 +42,9 @@ def get_generated_response(response):
 
 @app.get("/")
 def predict(englishText:str):
-# def predict():
-    # prompt format: python program + the desired action
+    # prompt format: # + desired command
     initialize_openai_api()
-    # englishText = 'def add_two_numbers(a, b): #initialise a to 3 in the function'
     prompt = create_input_prompt(englishText)
-    # print(prompt)
     response = generate_completion(prompt)
     op = get_generated_response(response)
-    # print(op)
-    
     return{"output":op}
