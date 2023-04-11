@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=2.17.2 <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -39,6 +39,9 @@ dependencies:
   flutter_highlight: ^0.7.0
   click_to_copy: ^0.0.1
   clipboard: ^0.1.3
+  speech_to_text: ^6.1.1
+  avatar_glow: ^2.0.2
+  get: ^4.6.5
 
 dev_dependencies:
   flutter_test:

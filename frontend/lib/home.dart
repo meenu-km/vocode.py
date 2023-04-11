@@ -1,15 +1,25 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:flutter/services.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:click_to_copy/click_to_copy.dart';
-import 'package:clipboard/clipboard.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_to_text.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   CodeController? _codeController;
-  TextEditingController controller = TextEditingController();
+
+  var isListening = false;
+  var text;
+  SpeechToText speechToText = stt.SpeechToText();
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -27,47 +37,18 @@ class Home extends StatelessWidget {
         backgroundColor: Color.fromARGB(255, 16, 79, 24),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: SizedBox(
-                width: 200,
-                child: Text(
-                  "voCode.py",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 20,
-                      fontFamily: "Aldrich"),
-                ),
-              ),
+          children: [
+            Text(
+              "voCode.py",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 20,
+                  fontFamily: "Aldrich"),
             ),
-            Container(
-              width: 250,
-              child: TextField(
-                controller: controller,
-              ),
-            ),
-            // SizedBox(
-            //   width: 30,
-            // ),
-            Container(
-              height: 80,
-              width: 80,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 5, 54, 6),
-                ),
-                onPressed: () {
-                  Clipboard.setData(new ClipboardData(text: controller.text))
-                      .then((_) {
-                    controller.clear();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Copied to your clipboard !')));
-                  });
-                },
-                child: const Text('Copy'),
-              ),
+            SizedBox(
+              width: 410,
             ),
             Text(
               "Help",
@@ -79,40 +60,87 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/img.png"),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                      Color.fromARGB(0, 6, 35, 2).withOpacity(.62),
-                      BlendMode.color),
-                ),
+      body: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/img.png"),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Color.fromARGB(0, 6, 35, 2).withOpacity(.62),
+                    BlendMode.color),
               ),
-              child: SingleChildScrollView(
-                child: Container(
-                  child: CodeField(
-                    controller: _codeController!,
-                    textStyle: TextStyle(
-                      fontFamily: 'SourceCode',
-                      fontSize: 20,
-                    ),
-                  ),
+            ),
+          ),
+          SingleChildScrollView(
+            child: Container(
+              child: CodeField(
+                controller: _codeController!,
+                textStyle: TextStyle(
+                  fontFamily: 'SourceCode',
+                  fontSize: 20,
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        onPressed: () {},
-        child: Icon(
-          Icons.settings_voice,
+      floatingActionButton: AvatarGlow(
+        glowColor: Colors.black,
+        endRadius: 75.0,
+        animate: true,
+        duration: Duration(milliseconds: 2000),
+        repeat: true,
+        repeatPauseDuration: Duration(microseconds: 1000),
+        showTwoGlows: true,
+        // onPressed: () {
+
+        // },
+        // child:GestureDetector(
+
+        //   onTapDown: (details){
+        //     setState((){
+        //       isListening = true;
+        //     }
+        //   );},
+        child: GestureDetector(
+          onTapDown: (details) async {
+            if (!isListening) {
+              var available = await speechToText.initialize();
+              if (available) {
+                setState(() {
+                  isListening = true;
+                  speechToText.listen(onResult: (result) {
+                    setState(() {
+                      text = result.recognizedWords;
+                      print(text);
+                    });
+                  });
+                });
+              }
+            }
+          },
+          onTapUp: (details) {
+            setState(() {
+              isListening = false;
+            });
+            speechToText.stop();
+          },
+          child: CircleAvatar(
+            // Icon(
+            //   Icons.settings_voice,
+            // ),
+            backgroundColor: Colors.black,
+            radius: 35,
+            child: Icon(
+              isListening
+                  ? Icons.settings_voice
+                  : Icons.settings_voice_outlined,
+            ),
+          ),
         ),
+        // ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       //backgroundColor: Image.asset('assets/img.png').color,
